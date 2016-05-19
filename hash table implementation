@@ -1,0 +1,101 @@
+#include <algorithm>     // Provides copy
+#include <cassert>  // Provides assert
+#include <cstdlib>  // Provides NULL, rand
+
+using namespace std;
+
+namespace main_savitch_12B
+{
+//CONSTRUCTOR for the Table<RecordType> template class:
+template <class RecordType>
+table<RecordType>::table( )
+{
+    total_records=0;//Set the number of records 0
+}
+//Postcondition: The Table has been initialized as an empty Table.
+//
+
+// MODIFICATION MEMBER FUNCTIONS for the Table<RecordType> class:
+template <class RecordType>
+void table<RecordType>::insert(const RecordType& entry)
+{
+    assert(entry.key>=0);
+    size_t index=hash(entry.key);//Calculate the hash index
+    
+    for(typename list<RecordType>::const_iterator it=data[index].begin();it!=data[index].end();it++)//Traverse data[index]'s list
+    {
+        if(it->key==entry.key)//If we found the pointer's data.key is equal to entry.key
+            return;//Done
+    }
+    assert(size()<TABLE_SIZE);//Ensure there is a space for this record
+    data[index].push_back(entry);//After traversal, there is no existing key equal to entry.key, insert the new pointer for this record in the list at data[index]
+    ++total_records;//Increment the total records
+}
+//Precondition: entry.key >= 0. Also if entry.key is not already a key in
+//the table, then the Table has space for another record
+//(i.e., size( ) < CAPACITY).
+//Postcondition: If the table already had a record with a key equal to
+//entry.key, then that record is replaced by entry. Otherwise, entry has
+//been added as a new record of the Table.
+//
+template <class RecordType>
+void table<RecordType>::remove(int key)
+{
+    size_t index=hash(key);//Calculate the hash index
+    
+    for(typename list<RecordType>::iterator it=data[index].begin();it!=data[index].end();it++)//Travese data[index]'s list
+    {
+        if(it->key==key)//When we find the link's key is equal to the removal key
+        {
+            data[index].erase(it);
+            --total_records;//Decrement the total records
+            return;//The record for this key is removed, done
+        }
+    }
+}
+//Postcondition: If a record was in the Table with the specified key, then
+//that record has been removed; otherwise the table is unchanged.
+//
+
+template <class RecordType>
+bool table<RecordType>::is_present(int key) const
+{
+    size_t index=hash(key);//Locate the index for this key
+    
+    for(typename list<RecordType>::const_iterator it=data[index].begin();it!=data[index].end();it++)//Travese data[index]'s list
+    {
+        if(it->key==key)
+            return true;//Return true if we found the key
+    }
+    return false;//Return false if we failed to find the key after traversal
+}
+//Postcondition: The return value is true if there is a record in the
+//Table with the specified key. Otherwise, the return value is false.
+//
+template <class RecordType>
+void table<RecordType>::find(int key, bool& found, RecordType& result) const
+{
+    size_t index=hash(key);//Locate the index for this key
+    found=false;//Initially set found false
+    
+    for(typename list<RecordType>::const_iterator it=data[index].begin();it!=data[index].end();it++)//Traverse the list in data[index]
+    {
+        if(it->key==key)
+        {
+            found=true;//Set found true if we found the key
+            result=*it;//Record the data for the result
+            return;//Return if we found the key
+        }
+    }
+}
+//Postcondition: If a record is in the Table with the specified key, then
+//found is true and result is set to a copy of the record with that key.
+//Otherwise found is false and the result contains garbage.
+
+template <class RecordType>
+size_t table<RecordType>::hash(int key) const
+{
+    return key%TABLE_SIZE;
+}
+//Postcondition: return the hash value
+}
