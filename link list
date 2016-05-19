@@ -1,0 +1,188 @@
+#include "LinkedList.h"
+#include <cassert>    // Provides assert
+#include <iostream>
+
+using namespace std;
+
+namespace khan
+ {
+
+    typedef double value_type;
+    typedef std::size_t size_type;
+    
+     //initail constructor
+     //efficiency: O(1)
+    set::set()
+    {
+        head_ptr = NULL;
+        size = 0;
+    }
+      //if the source size > 0 then copies source set
+      //efficiency: O(n)
+    set::set(const set &source)
+    {
+        assert(source.querySize() > 0);
+        node *tail_ptr;  
+
+        list_copy(source.head_ptr, head_ptr, tail_ptr);
+        size = source.size;
+    }
+      //deconstructor  O(n)
+    set::~set()
+    {
+        list_clear(head_ptr);
+        
+    }
+
+    // MODIFICATION MEMBER FUNCTIONS
+//searches for particular entry
+//O(n)
+    void set::insertion(const value_type &entry)
+    {
+        if (querySize() == 0) {
+            list_head_insert(head_ptr, entry);
+            size++;
+        }
+        else {
+            node *cursor = head_ptr;
+            bool foundEntry = false;
+            bool traverse = true;
+
+            while(traverse == true && foundEntry == false)
+            {
+                if(cursor->data() == entry)
+                    foundEntry = true;
+                if(cursor->link() == NULL)
+                    traverse = false;
+                else
+                    cursor = cursor->link();
+            }
+
+            if(foundEntry == false) {
+                list_insert(cursor, entry);
+                size++;
+            }
+        }
+    }
+
+//finds entry and deletes. if not then does nothing. O(n)
+    void set::deletion(const value_type &entry)
+    {
+        bool findEntry = false;
+        node *cursor = head_ptr;
+        node *previous_ptr;
+
+        if (cursor->data() == entry) {
+            list_head_remove(head_ptr);
+            size--;
+            return;
+        }
+
+        while (cursor != NULL && findEntry == false) {
+            previous_ptr = cursor;
+            cursor = cursor->link();
+            if(cursor != NULL)
+            {
+                if(cursor->data() == entry)
+                    findEntry = true;
+            }
+        }
+
+        if(findEntry == true) {
+            list_remove(previous_ptr);
+            size--;
+        }
+    }
+//if the entry is in the set results true. O(n)
+    bool set::queryElement(const value_type entry)
+    
+    {
+        if (list_search(head_ptr, entry) != NULL)
+            return true;
+        else
+            return false;
+    }
+//prints the entry of the set. O(n)
+    void set::display_set() const
+    
+    {
+        const node *cursor = head_ptr;
+
+        while (cursor != NULL && cursor->data() != NULL) {
+            cout << cursor->data() << " ";
+            cursor = cursor->link();
+        }
+        cout << endl;
+    }
+//set contains the same number as the original. O(n)
+    void set::operator=(const set &source)
+    {
+        node *tail_ptr;
+
+        if (this == &source)
+            return;
+
+        list_clear(head_ptr);
+        size = 0;
+        list_copy(source.head_ptr, head_ptr, tail_ptr);
+        size = source.querySize();
+    }
+//adds set together. if more then one copy, then still counts them ones. O(n)
+    void set::operator+=(const set &source)
+    {
+        node *cursor;
+
+        if (source.querySize() > 0) {
+            cursor = source.head_ptr;
+            while (cursor != NULL && cursor->data() != NULL) {
+                value_type searchItem = cursor->data();
+                set::insertion(searchItem);
+                cursor = cursor->link();
+            }
+        }
+    }
+//delete source elements form the original set. O(n)
+    void set::operator-=(const set &source)
+    {
+        node *cursor;
+
+        if (source.querySize() > 0) {
+            cursor = source.head_ptr;
+            while (cursor != NULL && cursor->data() != NULL) {
+                value_type searchItem = cursor->data();
+                set::deletion(searchItem);
+                cursor = cursor->link();
+            }
+        }
+    }
+
+    // NON MEMBER FUNCTIONS
+    
+    //returns realtive compliment set. O(n)
+    set complementSet(set set1, set set2)
+    {
+        set unionSet;
+        unionSet += set1;
+        unionSet -= set2;
+        return unionSet;
+    }
+//returns union of set. O(n)
+    set unionSet(set set1, set set2)
+    {
+        set unionSet;
+        unionSet += set1;
+        unionSet += set2;
+        return unionSet;
+        return unionSet;
+    }
+
+//returns intersect of set. O(n)
+    set intersect(set set1, set set2)
+    {
+        set intersect(unionSet(set1, set2));
+        intersect -= complementSet(set1, set2);
+        intersect -= complementSet(set2, set1);
+        return intersect;
+    }
+
+}
