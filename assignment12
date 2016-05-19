@@ -1,0 +1,57 @@
+//this is the implementation of shellsort
+
+#include <iostream>
+#include <algorithm>
+#include <cmath>
+using namespace std;
+ 
+//Print values
+void print_ar (int ar[], int size)
+{
+  for (int i = 0; i < size; ++i) {
+    cout << ar[i] << " ";
+  }
+  cout << endl;
+}
+
+//so it takes the gap/2.2 and round it off to the nearest integer
+int round(int n) {
+    if ((n*10+11)/22 > n/2.2)
+        return n/2.2+1;
+    else 
+        return n/2.2;
+}
+
+ 
+//Shell sort implementation
+void shell_sort (int array[], int size)
+{
+  int j;
+ int gap = size/2;
+ 
+ while (gap > 0) {
+     for (int i= gap; i < size; i++){
+         for ( ;i >= gap && array[i]<array[i-gap]; i-=gap){
+             swap (array[i], array[i-gap]);
+         }
+     }
+     gap=round(gap);
+ }
+}
+     
+ 
+
+int main ()
+{
+  int ar[] = {36, 78,2, 68, 109, 65, 88, 23, 10, 2};
+ 
+  cout << "Intial Array : ";
+  print_ar (ar, 10);
+ 
+  shell_sort (ar, 10);
+ 
+  cout << "Sorted Array : ";
+  print_ar (ar, 10);
+ 
+  return 0;
+}
