@@ -1,0 +1,86 @@
+#include <cassert>    // Provides assert
+#include <algorithm> // Provides swap
+
+using namespace std;
+
+template<typename T>
+heap<T>::heap()
+{
+    
+}
+
+template<typename T>
+unsigned int heap<T>::size() const
+{
+    return v.size();
+}
+
+template<typename T>
+bool heap<T>::is_empty() const
+{
+    return v.empty();
+}
+
+template<typename T>
+void heap<T>::insert (const T& item)
+{
+    v.push_back(item); //push the item in
+    unsigned int i=v.size()-1;//gives the index of the last item
+    while(i>0)
+    {
+        if(v[i]>v[(i)/2])//if the node is greater then parent then swap
+        {
+            swap(v[i],v[(i)/2]); 
+        }
+        i=(i)/2;//reheapification upward
+    }
+}
+
+template<typename T>
+void heap<T>::remove()
+{
+    v.pop_back();//Delete the last node
+    v[0]=v[size()-1];//Move the last node onto the root.
+    unsigned int i=0;//starting point of the index
+    while(2*i+1<size())//checks whether the parent has a child
+    {
+        unsigned int j=max_child(i);
+        if(v[i]<v[j])
+        {
+            swap(v[i],v[j]);
+        }
+        i=j;//reheapification downward.
+    }
+}
+
+template<typename T>
+T heap<T>::max() const
+{
+    assert(!is_empty());
+    return v[0];
+}
+
+template<typename T>
+T& heap<T>::max()
+{
+    assert(!is_empty());
+    return v[0];
+}
+
+template<typename T>
+void heap<T>::show()
+{
+    for(unsigned int i=0;i<size();i++)
+        cout<<v[i]<<" ";
+    cout<<endl;
+}
+
+template<typename T>
+unsigned int heap<T>::max_child (unsigned int index) const
+{
+    assert(2*index+1<size()); //if a parent has a left child then it'll be less then size
+    if(v[2*index+1]>v[2*index+2]||2*index+2==size())//compares the two siblings or if there isn't a right child then it gives the left.
+    return 2*index+1;
+    else
+    return 2*index+2;
+}
